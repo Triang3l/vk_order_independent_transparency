@@ -33,8 +33,8 @@
 // problems with transparent and opaque objects in MSAA, and implicitly enables
 // early_fragment_tests.
 // See https://www.khronos.org/registry/OpenGL/extensions/ARB/ARB_post_depth_coverage.txt
-#extension GL_ARB_post_depth_coverage : enable
-layout(post_depth_coverage) in;
+/* #extension GL_ARB_post_depth_coverage : enable
+layout(post_depth_coverage) in; */
 
 // If OIT_COVERAGE_SHADING is used, then the a-buffer uses three components;
 // otherwise, it uses two.

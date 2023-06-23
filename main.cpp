@@ -1094,7 +1094,7 @@ int main(int argc, const char** argv)
 
   Sample sample;
   sample.m_contextInfo.addDeviceExtension(VK_EXT_DESCRIPTOR_INDEXING_EXTENSION_NAME);
-  sample.m_contextInfo.addDeviceExtension(VK_EXT_POST_DEPTH_COVERAGE_EXTENSION_NAME);
+  // sample.m_contextInfo.addDeviceExtension(VK_EXT_POST_DEPTH_COVERAGE_EXTENSION_NAME);
   sample.m_contextInfo.addDeviceExtension(VK_KHR_SAMPLER_MIRROR_CLAMP_TO_EDGE_EXTENSION_NAME);
   // Enable VK_KHR_maintenance4 so that the depth pass' fragment shader in
   // loop32, which does not consume the interpolants from the vertex shader,

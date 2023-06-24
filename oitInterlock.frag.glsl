@@ -100,8 +100,37 @@ void main()
 
   uvec4 storeValue = uvec4(packUnorm4x8(sRGBColor), floatBitsToUint(gl_FragCoord.z), storeMask, 0);
 
+#if OIT_SAMPLE_SHADING
+  bool doAccess = true;
+#else
+  // EDIT: THIS IS BROKEN, IGNORE IT!
+  // This was written assuming that gl_SampleMaskIn behaves like SV_Coverage in Direct3D, which is
+  // not the case (gl_SampleMaskIn contains only one sample with sample shading).
+  //
+  // Test of pixel_interlock with sample shading - force sample shading for pixel interlock modes,
+  // and use pixel-local storage shared between all samples of the pixel, but only access it once
+  // for each pixel from each primitive (as invocations for the same primitive are not guaranteed to
+  // be interlocked according to the specification).
+  //
+  // Use an "msaa pixel-shading" anti-aliasing mode and ordered interlock for testing, and
+  // preferably reduce the number of objects before switching to "msaa pixel-shading" if testing on
+  // a low-end AMD device like the APUs as pixel interlock with MSAA has a severe performance hit
+  // there.
+  //
+  // If common edges of adjacent primitives are stable between frames, the device supports
+  // pixel_interlock with sample shading.
+  //
+  // Otherwise, the device can only provide Direct3D-ROV-like interlock (only sample interlock with
+  // sample shading), and thus is not fully compatible with the requirements of pixel_interlock.
+  //
+  // The latter can be simulated by changing the pixel_interlock_ordered execution mode to
+  // sample_interlock_ordered if the device supports true sample interlock.
+  bool doAccess = gl_SampleID == findLSB(gl_SampleMaskIn[0]);
+#endif
+
   // Critical section --
   beginInvocationInterlock();
+  if (doAccess) {
 #if USE_EARLYDEPTH
   uint oldDepth = imageLoad(imgDepth, coord).r;
   if(storeValue.y <= oldDepth)
@@ -143,6 +172,7 @@ void main()
 #endif  // #if USE_EARLYDEPTH
       }
     }
+  }
   }
   endInvocationInterlock();
 // -- End critical section
